@@ -9,8 +9,9 @@ const ThotSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  username: {
-    type: String,
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
   created_at: {
@@ -26,4 +27,4 @@ ThotSchema
     return '/thot/' + this._id;
   });
 
-module.exports = mongoose.model('User', ThotSchema);
+module.exports = mongoose.model('Thot', ThotSchema);
