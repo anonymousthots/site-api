@@ -35,44 +35,40 @@ const allThots = [];
 //   username: randomstring.generate(15)
 // }
 
-const userCreate = async ({ email, password, username }, cb) => {
-  try {
-    let user = await User.findOne({ username }) || null;
-    if (user) username = randomstring.generate(15);
-    user = new User({ email, password, username });
-
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
-
-    user.password = hash;
-    const saveUser = await user.save();
-    console.log('New User',user);
-    allUsers.push(saveUser);
-    cb(null, user);
-
-    // allUsers.push(user);
-
-    // user.save(function (err) {
-    //   if (err) {
-    //     cb(err, null);
-    //     return;
-    //   }
-    //   console.log('New User: ' + user);
-    //   allUsers.push(user);
-    //   cb(null, user);
-    // });
-
-  } catch (e) {
-    console.error(e);
-    cb(err, null);
-  }
-}
-
 const generateRandomUsername = () => {
   return 'user_' + randomstring.generate(15);
 }
 
-function createUsers(cb) {
+const userCreate = async ({ email, password, username }, cb) => {
+  try {
+    let foundUser = await User.findOne({ username });
+    if (foundUser) username = generateRandomUsername();
+
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+
+    const user = await User.create({ email, password: hash, username });
+    console.log('New User', user);
+    allUsers.push(user);
+    cb(null, user);
+
+  } catch (e) {
+    console.error(e);
+    cb(e, null);
+  }
+}
+
+// const thotCreate = async ({title, body, userId}, cb) => {
+//   try {
+//     const thot = new Thot({ title, body, userId });
+//     thot.save();
+//   } catch (e) {
+//     console.error(e);
+//     res.status(500).json({ message: 'Server error' });
+//   }
+// }
+
+const createUsers = (cb) => {
   async.series([ // need to use series b/c pushing in Users array in order of new User creation.
     function (callback) {
       const email = 'theanonymousthots@gmail.com';
@@ -83,7 +79,20 @@ function createUsers(cb) {
       const email = 'janedoe@email.com';
       const password = '123456789';
       userCreate({ email, password, username: generateRandomUsername() }, callback);
+    },
+    function (callback) {
+      const email = 'anotheremail@gmail.com';
+      const password = '1234567890';
+      userCreate({ email, password, username: 'user_u45UjSxCqt0b5Tl' }, callback);
     }
+  ],
+  // optional callback
+  cb);
+}
+
+const createThots = () => {
+  async.parallel([
+
   ],
   // optional callback
   cb);
@@ -93,25 +102,15 @@ async.series([
   createUsers, // series
   // createThots, // parallel
 ], 
-(err, results) => {
-  if (err) {
-    console.log('FINAL ERROR: ' + err);
+(e, res) => {
+  if (e) {
+    console.log('FINAL ERROR: ' + e);
   } else {
     console.log('else')
     console.log('USER INSTANCES: ' + allUsers);
+    console.log('results', res)
   }
 
   // Async series complete, now disconnect from database
   mongoose.connection.close();
-})
-
-// const thotCreate = async (title, body, username) => {
-//   try {
-//     const thot = new Thot({ title, body, username });
-//     thot.save();
-//   } catch (e) {
-//     console.error(e);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// }
-
+});
