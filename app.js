@@ -6,16 +6,14 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const InitiateMongoServer = require('./config/db');
 const mongoUri = process.env.MONGO_DB_URI;
+const mongoTestUri = process.env.MONGO_DB_URI_TEST;
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
-InitiateMongoServer(mongoUri);
+// InitiateMongoServer(mongoUri);
+InitiateMongoServer(mongoTestUri);
 const app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
