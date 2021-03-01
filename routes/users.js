@@ -4,7 +4,12 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
 
-/* GET users listing. */
+/**
+ * @method - GET
+ * @param - /user/:username
+ * @description - Get user instance
+ */
+
 router.get('/:username', async (req, res, next) => {
   const username = req.params.username;
 
