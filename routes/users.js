@@ -6,11 +6,11 @@ const User = require('../models/user');
 
 /**
  * @method - GET
- * @param - /user/:username
+ * @param - /users/:username
  * @description - Get user instance
  */
 
-router.get('/:username', async (req, res, next) => {
+router.get('/:username', (req, res, next) => {
   const username = req.params.username;
 
   User.find({ username })
